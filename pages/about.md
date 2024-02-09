@@ -1,18 +1,15 @@
 ---
 layout: page
 title: About
-description: 打码改变世界
-keywords: Zhuang Ma, 马壮
+description: r3c0nb4's blog
+keywords: system security
 comments: true
-menu: 关于
+menu: about
 permalink: /about/
 ---
 
-我是马壮，码而生，码而立。
-
-仰慕「优雅编码的艺术」。
-
-坚信熟能生巧，努力改变人生。
+I am a master student enrolled in Vrije University Amsterdam.
+I focus on microarchitecture security research.
 
 ## 联系
 

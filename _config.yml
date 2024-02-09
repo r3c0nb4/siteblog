@@ -70,29 +70,29 @@ email: y30.chen@student.vu.nl
 navs:
   -
     href: /
-    label: 首页
+    label: main
 
   -
     href: /categories/
-    label: 分类
+    label: categories
 
   -
     href: /archives/
-    label: 归档
+    label: archives
     mobile-hidden: true
 
   -
     href: /open-source/
-    label: 开源
+    label: open-source
     mobile-hidden: true
 
   -
     href: /fragments/
-    label: 片段
+    label: fragments
 
   -
     href: /wiki/
-    label: 维基
+    label: wiki
 
   -
     href: /links/
