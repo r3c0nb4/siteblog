@@ -96,12 +96,12 @@ navs:
 
   -
     href: /links/
-    label: 链接
+    label: links
     mobile-hidden: true
 
   -
     href: /about/
-    label: 关于
+    label: about
 
 # ---------------- #
 #       RSS        #
