@@ -13,7 +13,7 @@ encoding: "utf-8"
 # 页面左下角显示的年份
 since: 2024
 # 源码仓库，请替换成自己的
-repository: r3c0nb4/r3c0nb4.github.io
+repository: r3c0nb4/siteblog
 # 对 css 和 js 资源的 cdn 加速配置
 cdn:
     jsdelivr:
