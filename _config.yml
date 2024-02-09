@@ -2,7 +2,7 @@
 #   Main Configs   #
 # ---------------- #
 baseurl:
-url: https://r3c0nb4.github.io
+url: https://r3c0nb4.github.io/siteblog
 date_format: "ordinal"
 title: r3c0nb4's blog
 subtitle: "Yuxuan Chen"
