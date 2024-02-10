@@ -11,7 +11,7 @@ permalink: /about/
 I am a master student enrolled in Vrije University Amsterdam.
 I focus on microarchitecture security research.
 
-## 联系
+## Contact
 
 <ul>
 {% for website in site.data.social %}
@@ -20,7 +20,7 @@ I focus on microarchitecture security research.
 {% if site.url contains 'mazhuang.org' %}
 <li>
 微信公众号：<br />
-<img style="height:192px;width:192px;border:1px solid lightgrey;" src="{{ site.url }}/assets/images/qrcode.jpg" alt="闷骚的程序员" />
+<img style="height:192px;width:192px;border:1px solid lightgrey;" src="{{ site.url }}/assets/images/qrcode.jpg" alt="r3c0nb4" />
 </li>
 {% endif %}
 </ul>
