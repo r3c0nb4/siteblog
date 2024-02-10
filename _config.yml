@@ -76,10 +76,10 @@ navs:
     href: /categories/
     label: categories
 
-  -
-    href: /archives/
-    label: Archives
-    mobile-hidden: true
+#   -
+#     href: /archives/
+#     label: Archives
+#     mobile-hidden: true
 
 #   -
 #     href: /open-source/
