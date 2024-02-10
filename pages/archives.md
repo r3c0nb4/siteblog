@@ -7,6 +7,7 @@ comments: false
 menu: Archives
 permalink: /archives/
 ---
+The archives for posted blogs.
 
 <section class="container posts-content">
 {% assign count = 1 %}
@@ -32,7 +33,7 @@ permalink: /archives/
     {% assign nyear = post.next.date | date: '%Y' %}
     {% if year != nyear %}
         {% if thisyear != 1 %}
-            </ol>
+            
         {% endif %}
 <h3>{{ post.date | date: '%Y' }} ({{ counts[i] }})</h3>
         {% if thisyear != 0 %}
