@@ -94,10 +94,10 @@ navs:
 #     href: /wiki/
 #     label: wiki
 
-  -
-    href: /links/
-    label: links
-    mobile-hidden: true
+#   -
+#     href: /links/
+#     label: links
+#     mobile-hidden: true
 
   -
     href: /about/
