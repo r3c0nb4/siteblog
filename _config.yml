@@ -81,18 +81,18 @@ navs:
     label: archives
     mobile-hidden: true
 
-  -
-    href: /open-source/
-    label: open-source
-    mobile-hidden: true
+#   -
+#     href: /open-source/
+#     label: open-source
+#     mobile-hidden: true
 
-  -
-    href: /fragments/
-    label: fragments
+#   -
+#     href: /fragments/
+#     label: fragments
 
-  -
-    href: /wiki/
-    label: wiki
+#   -
+#     href: /wiki/
+#     label: wiki
 
   -
     href: /links/
