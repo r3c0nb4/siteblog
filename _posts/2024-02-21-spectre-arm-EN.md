@@ -30,7 +30,7 @@ if (x < array1_size)
 `array2` 范围的位置, 并且用获取的值访问 `reloadbuffer` (`array1`). 这时候我们可以通过 flush and reload 测信道获取这个值.
 
 ## Spectre V1 Arm cortex A57 implementation
-有一个开源的仓库目前实现了 Arm 上的Spectre V1攻击, 我的实现中利用了他的分支训练思路, 暂时找不到是哪个了, 我找到了之后再更新.
+有一个开源的仓库目前实现了 Arm 上的Spectre V1攻击, 我的实现中利用了他的分支训练思路, https://github.com/V-E-O/PoC/tree/master/CVE-2017-5753
 大致思路如下:
 
 首先我们通过 flush and reload 计算出 cache hit 和 cache miss 的分界是多少.
