@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Flush reload on ARM English Version
-categories: [Microarchitecture, processor reverse engineering, English version]
+categories: [Microarchitecture, processor reverse engineering, English Version]
 description: flush and reload attack on ARM English Version
 keywords: Microarchitecture
 mermaid: false

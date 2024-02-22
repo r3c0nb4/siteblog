@@ -1,7 +1,7 @@
 ---
 layout: post
-title: Spectre on Arm cortex A57
-categories: [Microarchitecture vulnerability]
+title: Spectre on Arm cortex A57 English Version
+categories: [Microarchitecture vulnerability, English Version]
 description: Cache
 keywords: Microarchitecture
 mermaid: false
@@ -13,33 +13,28 @@ mindmap2: false
 ---
 
 # Spectre V1 on Arm
-本文主要讨论spectre v1在Arm Cortex 57上的实现．具体的原理可以查看论文　https://spectreattack.com/spectre.pdf.
-Spectre 的原理不复杂, 但是具体的实现不太好描述 (本人表达能力实在很有限, 高中语文考试基本都是倒数, 如果你不巧看到这个文章看的很糊涂, 可以发邮件问我
-, 但是有些问题我也不会). 全部的代码会在毕业设计结束之后开源.
+This article mainly discusses the implementation of Spectre v1 on Arm Cortex 57. For specific principles, please refer to the paper at https://spectreattack.com/spectre.pdf. The principle of Spectre is not complicated, but its specific implementation is not easy to describe. (My ability to express myself is very limited, and I usually score poorly in literature classes. If you find this article confusing, you can email me for clarification, although there are some questions I may not be able to answer.) All the code will be open-sourced after the completion of the graduation project.
 ## Spectre V1
-
-最基本的就是，假如我将`array1_size` flush, 那么 CPU 需要一些时间访问物理内存获取变量的值.
-这时候很多处理器会触发 out of order execution 乱序执行跳过这个分支判断. CPU 中一般存在一个缓存存储一些分支判断的结果,
-在跳过这个判断的时候,会参考这个缓存, 如果之前几次的分支判断都是 True, 那么在乱序执行中, 这个分支就会默认为通过, 从而执行
-分支内部的代码. 
+Basically, if I flush `array1_size`, the CPU needs some time to access physical memory to retrieve the variable's value. During this process, many processors may trigger out-of-order execution, skipping the conditional branch. Typically, there is a cache inside the CPU to store some results of conditional branches. When skipping the conditional branch, the CPU refers to this cache. If the previous several conditional branches were all true, then in the process of out-of-order execution, this branch would be assumed to be taken by default, and the code inside the branch would be executed.
 ```
 if (x < array1_size)
     y = array2[array1[x] * 4096];
 ```
-假设现在我们通过一些方法使得分支预测缓存里对于这个判断的结果都是通过, 但是传如一个 `x` 的值大于 `array_size`, 此时程序可以访问一个超出
-`array2` 范围的位置, 并且用获取的值访问 `reloadbuffer` (`array1`). 这时候我们可以通过 flush and reload 测信道获取这个值.
+
+Suppose we manipulate the branch prediction cache so that it always predicts the result of this condition as true. However, if we pass a value `x` greater than `array_size`, the program can access a position beyond the range of `array2`, and then use the retrieved value to access `reloadbuffer` (or `array1`). In this scenario, we can exploit the flush-and-reload side-channel to obtain this value.
+
 
 ## Spectre V1 Arm cortex A57 implementation
-有一个开源的仓库目前实现了 Arm 上的Spectre V1攻击, 我的实现中利用了他的分支训练思路, 暂时找不到是哪个了, 我找到了之后再更新.
-大致思路如下:
+There is an open-source repository that currently implements the Spectre V1 attack on Arm architecture. In my implementation, I leverage their branch training approach. I am currently unable to locate it, but I will update once I find it.
 
-首先我们通过 flush and reload 计算出 cache hit 和 cache miss 的分界是多少.
+The general approach is as follows:
+
+Firstly, we use the flush-and-reload technique to determine the boundary between cache hits and cache misses.
 ```
 CACHE_THRESHOLD = measure_latency();
 ```
 
-随后我们开始训练分支并且泄漏我们想要泄漏的字符串. 先将我们的 `reloadbuffer` 从缓存中 flush 掉. 最好在每一次内存操作的时候添加一个内存屏障 `barrier`,
-从而保证我们操作内存的时候, 不会因为乱序执行导致 flush 没有结束的时候后面的指令就开始执行. 
+Next, we start training branches and leak the string we want to retrieve. Firstly, we flush our `reloadbuffer` from the cache. It's preferable to add a memory barrier (`barrier`) before each memory operation to ensure that the flush completes before subsequent instructions start executing, thus preventing flushes from being interrupted by out-of-order execution.
 
 ```
 for (int i = 0; i < 256; i++)
@@ -51,13 +46,14 @@ static inline __attribute__((always_inline)) void barrier(void){
 }
 ```
 
-我们将我们想要泄漏的字符串大小的值同时也 flush 出缓存, 导致分支判断变慢.
+We also flush the size of the string we want to leak from the cache, causing the branch prediction to slow down.
 ```
 cacheflush(&array1_size);
 ```
 
-这时候我们开始训练分支预测, 将分支预测训练为通过. 只有在 `j` 可以整除 `10` 的时候, `probe_addr` 会是 `target` 也就是我们想要泄漏的地址.
-其他时候 `j` 都是 `train_index`, `train_index` 是在 `array1_size` 范围当中的. 每一轮最后 `probe_addr` 会变成 `target` (不在 `array1` 范围中).
+At this point, we begin training the branch prediction to predict the branch as taken. Only when `j` is divisible by `10`, `probe_addr` will be set to `target`, which is the address we want to leak. Otherwise, `j` will be set to `train_index`, where `train_index` falls within the range of `array1_size`. At the end of each iteration, probe_addr will be set back to target (outside the range of `array1`).
+
+
 
 
 ```
@@ -76,9 +72,8 @@ void spectre_v1(size_t *index) {
 }
 ```
 
-最后我们进行 `reload` 操作, 这里我们用了 `index = ((i * 167) + 13) & 255;` 打乱的访问顺序, 防止 prefetcher 干扰.
-假如我们访问一个位置的时间少于我们计算出的 `CACHE_THRESHOLD`, 说明这时候出现了 cache hit, 也就是 `spectre_v1` 函数中访问过了
-这个位置. 那么这个值就是我们要泄漏的一个字节. 
+
+Finally, we perform the `reload` operation. Here, we use a scrambled access pattern `index = ((i * 167) + 13) & 255`; to prevent interference from the prefetcher. If the access time to a position is less than the calculated `CACHE_THRESHOLD`, it indicates a cache hit, meaning that the position has been accessed in the `spectre_v1` function. Therefore, this value is the byte we want to leak.
 ```
 for (int i = 0; i < 256; i++)
 {
@@ -89,7 +84,7 @@ for (int i = 0; i < 256; i++)
 }
 ```
 
-有一些比较重要的汇编内联函数大概是这样:
+Some of the more important inline assembly functions look something like this:
 ```
 static inline __attribute__((always_inline)) void cacheflush(void* address)
 {
