@@ -25,7 +25,7 @@ Suppose we manipulate the branch prediction cache so that it always predicts the
 
 
 ## Spectre V1 Arm cortex A57 implementation
-There is an open-source repository that currently implements the Spectre V1 attack on Arm architecture. In my implementation, I leverage their branch training approach. I am currently unable to locate it, but I will update once I find it.
+There is an open-source repository that currently implements the Spectre V1 attack on Arm architecture. In my implementation, I leverage their branch training approach https://github.com/V-E-O/PoC/tree/master/CVE-2017-5753.
 
 The general approach is as follows:
 
