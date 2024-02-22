@@ -1,7 +1,7 @@
 ---
 layout: post
-title: Cpu cache English version
-categories: [Microarchitecture, processor reverse engineering, English version]
+title: Cpu cache English Version
+categories: [Microarchitecture, processor reverse engineering, English Version]
 description: Cache
 keywords: Microarchitecture
 mermaid: false
