@@ -111,6 +111,68 @@ arm_v8_reset_timing(void)
 ```
 但是 `MRS` 指令在我的设备上一直显示 illegal instruction ， 可能一些设备不支持这个指令。具体的解决方法暂时还没有找到，要是能找到会尽快更新这篇文章。
 
+破案了, 现在更新一下这一段, illegal instruction 不是因为设备不支持,我们是可以通过其他方法使用performance counters的.
+其实也很简单, 我们需要一个内核模块enable performance counter
+```
+#include <linux/kernel.h>
+#include <linux/module.h>
+
+static void enable(void *in)
+{
+	u64 cycles;
+
+	asm volatile("msr pmuserenr_el0, %0" : : "r"(BIT(0) | BIT(2)));
+	asm volatile("mrs %0, pmcr_el0" : "=r" (cycles));
+	cycles |= (BIT(0) | BIT(2));
+	asm volatile("msr pmcr_el0, %0" : : "r" (cycles));
+	cycles = BIT(27);
+	asm volatile("msr pmccfiltr_el0, %0" : : "r" (cycles));
+}
+
+static void disable(void *in)
+{
+	asm volatile("msr pmcntenset_el0, %0" :: "r" (0 << 31));
+	asm volatile("msr pmuserenr_el0, %0" : : "r"((u64)0));
+
+}
+
+static int __init init(void)
+{
+	on_each_cpu(enable, NULL, 1);
+	return 0;
+
+}
+
+static void __exit fini(void)
+{
+	on_each_cpu(disable, NULL, 1);
+}
+
+module_init(init);
+module_exit(fini);
+```
+
+随后就可以使用performance counter了
+```
+static inline uint64_t cycles(void)
+{
+	uint64_t val;
+	asm volatile("mrs %0, pmccntr_el0" : "=r"(val));
+	return val;
+}
+
+static uint64_t cycles_read(volatile uint8_t *addr){
+	volatile uint8_t pick = 0;
+	uint64_t cycles1 = 0, cycles2 = 0;
+	
+	cycles1 = cycles();	
+	pick = *addr;
+	cycles2 = cycles();
+	barrier();
+	return cycles2 - cycles1;
+}
+```
+
 ### Alternative
 有一个库提供的函数可以实现记时功能，但是最小的单位是 nanosecond，尽管精度上会差一些，但是对于 flush and reload 也许可行。
 

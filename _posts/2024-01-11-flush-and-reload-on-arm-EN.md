@@ -109,6 +109,69 @@ arm_v8_reset_timing(void)
 }
 ```
 However, the MRS instruction consistently displays an "illegal instruction" error on my device, indicating that some devices may not support this instruction. A specific solution to this issue has not yet been found. If a solution is found, I will update this article as soon as possible.
+
+Update: we are able to use performane counters for time measurement now:
+Just use kernel module to enable it, then it will not display "illegal instruction" anymore.
+
+```
+#include <linux/kernel.h>
+#include <linux/module.h>
+
+static void enable(void *in)
+{
+	u64 cycles;
+
+	asm volatile("msr pmuserenr_el0, %0" : : "r"(BIT(0) | BIT(2)));
+	asm volatile("mrs %0, pmcr_el0" : "=r" (cycles));
+	cycles |= (BIT(0) | BIT(2));
+	asm volatile("msr pmcr_el0, %0" : : "r" (cycles));
+	cycles = BIT(27);
+	asm volatile("msr pmccfiltr_el0, %0" : : "r" (cycles));
+}
+
+static void disable(void *in)
+{
+	asm volatile("msr pmcntenset_el0, %0" :: "r" (0 << 31));
+	asm volatile("msr pmuserenr_el0, %0" : : "r"((u64)0));
+
+}
+
+static int __init init(void)
+{
+	on_each_cpu(enable, NULL, 1);
+	return 0;
+
+}
+
+static void __exit fini(void)
+{
+	on_each_cpu(disable, NULL, 1);
+}
+
+module_init(init);
+module_exit(fini);
+```
+
+```
+static inline uint64_t cycles(void)
+{
+	uint64_t val;
+	asm volatile("mrs %0, pmccntr_el0" : "=r"(val));
+	return val;
+}
+
+static uint64_t cycles_read(volatile uint8_t *addr){
+	volatile uint8_t pick = 0;
+	uint64_t cycles1 = 0, cycles2 = 0;
+	
+	cycles1 = cycles();	
+	pick = *addr;
+	cycles2 = cycles();
+	barrier();
+	return cycles2 - cycles1;
+
+}
+```
 ### Alternative
 There is a library-provided function that can implement timing functionality, but the smallest unit it supports is nanoseconds. While this may result in some loss of precision, it might still be feasible for the flush and reload technique.
 https://man7.org/linux/man-pages/man3/clock_gettime.3.html
